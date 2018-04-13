@@ -8,19 +8,21 @@ import com.example.android.pets.data.PetContract.PetEntry;
 
 public class PetDbHelper extends SQLiteOpenHelper
 {
+    // Database name and version
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Pets.db";
+    public static final String DATABASE_NAME = "shelter.db";
 
     private static final String INTEGER_TYPE = " INTEGER";
     private static final String TEXT_TYPE = " TEXT";
+    private static final String NOT_NULL_TYPE = " NOT NULL";
     private static final String COMMA_SEP = ",";
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + PetEntry.TABLE_NAME + " (" +
                     PetEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    PetEntry.COLUMN_PET_NAME + TEXT_TYPE + COMMA_SEP +
+                    PetEntry.COLUMN_PET_NAME + TEXT_TYPE + NOT_NULL_TYPE + COMMA_SEP +
                     PetEntry.COLUMN_PET_BREED + TEXT_TYPE + COMMA_SEP +
-                    PetEntry.COLUMN_PET_GENDER + INTEGER_TYPE + COMMA_SEP +
-                    PetEntry.COLUMN_PET_WEIGHT + INTEGER_TYPE + ")";
+                    PetEntry.COLUMN_PET_GENDER + INTEGER_TYPE + NOT_NULL_TYPE + COMMA_SEP +
+                    PetEntry.COLUMN_PET_WEIGHT + INTEGER_TYPE + NOT_NULL_TYPE + " DEFAULT 0);";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + PetEntry.TABLE_NAME;
