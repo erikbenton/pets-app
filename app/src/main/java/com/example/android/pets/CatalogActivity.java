@@ -57,8 +57,6 @@ public class CatalogActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        displayDatabaseInfo();
     }
 
     @Override
