@@ -15,6 +15,7 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -120,7 +121,13 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Do nothing for now
+                // Getting Pet Values
+//                ContentValues values = new ContentValues();
+//                values.put(PetEntry.COLUMN_PET_NAME, mNameEditText.toString());
+//                values.put(PetEntry.COLUMN_PET_BREED, mBreedEditText.toString());
+//                values.put(PetEntry.COLUMN_PET_GENDER, mGender);
+//                values.put(PetEntry.COLUMN_PET_WEIGHT, mWeightEditText.toString());
+
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
