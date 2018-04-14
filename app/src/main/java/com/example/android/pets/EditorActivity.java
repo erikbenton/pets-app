@@ -16,6 +16,8 @@
 package com.example.android.pets;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -27,9 +29,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract;
 import com.example.android.pets.data.PetContract.PetEntry;
+import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -66,6 +70,50 @@ public class EditorActivity extends AppCompatActivity {
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
         setupSpinner();
+    }
+
+    private void insertPet()
+    {
+        // Getting Pet Values
+        String nameString = mNameEditText.getText().toString().trim();
+        String breedString = mBreedEditText.getText().toString().trim();
+        int weight = Integer.parseInt(mWeightEditText.getText().toString().trim());
+
+        // Creating an entry for the database
+        ContentValues values = new ContentValues();
+        values.put(PetEntry.COLUMN_PET_NAME, nameString);
+        values.put(PetEntry.COLUMN_PET_BREED, breedString);
+        values.put(PetEntry.COLUMN_PET_GENDER, mGender);
+        values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
+
+        // Get the writable database
+        PetDbHelper mDbHelper = new PetDbHelper(this);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // Insert the values into the database
+        // Save row number for entry
+        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+
+        // Show Toast message
+        Context context = getApplicationContext();
+
+        // Getting toast message
+        CharSequence text;
+        if(newRowId == -1)
+        {
+            text = "Error saving pet";
+        }
+        else
+        {
+            text = "Pet saved with id: " + newRowId;
+        }
+
+        // Set length of toast message
+        int duration = Toast.LENGTH_SHORT;
+
+        // Create and show toast message
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     /**
@@ -121,13 +169,11 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Getting Pet Values
-//                ContentValues values = new ContentValues();
-//                values.put(PetEntry.COLUMN_PET_NAME, mNameEditText.toString());
-//                values.put(PetEntry.COLUMN_PET_BREED, mBreedEditText.toString());
-//                values.put(PetEntry.COLUMN_PET_GENDER, mGender);
-//                values.put(PetEntry.COLUMN_PET_WEIGHT, mWeightEditText.toString());
+                // Insert the pet into the database
+                insertPet();
 
+                // Go back to Catalog
+                finish();
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:

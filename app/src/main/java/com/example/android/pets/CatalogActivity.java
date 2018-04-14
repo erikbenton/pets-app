@@ -36,10 +36,17 @@ import com.example.android.pets.data.PetContract.PetEntry;
  */
 public class CatalogActivity extends AppCompatActivity {
 
+    // Variable for holding database helper
+    private PetDbHelper mDbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
+
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+        // and pass the context, which is the current activity.
+        mDbHelper = new PetDbHelper(this);
 
         // Setup FAB to open EditorActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -54,14 +61,18 @@ public class CatalogActivity extends AppCompatActivity {
         displayDatabaseInfo();
     }
 
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        displayDatabaseInfo();
+    }
+
     /**
      * Temporary helper method to display information in the onscreen TextView about the state of
      * the pets database.
      */
     private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        PetDbHelper mDbHelper = new PetDbHelper(this);
 
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -90,25 +101,23 @@ public class CatalogActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, "Toto");
         values.put(PetEntry.COLUMN_PET_BREED, "Terrier");
-        values.put(PetEntry.COLUMN_PET_GENDER, 1);
+        values.put(PetEntry.COLUMN_PET_GENDER, PetEntry.GENDER_MALE);
         values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
 
         // Get the writable database
-        PetDbHelper mDbHelper = new PetDbHelper(this);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
+        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+
         // Insert data into table
-        if(db.insert(PetEntry.TABLE_NAME, null, values) == -1)
+        if(newRowId == -1)
         {
-            Log.v("INSERTTING PET INFO", "Unable to insert " + values.get(PetEntry.COLUMN_PET_NAME).toString());
+            Log.v("INSERTING PET INFO", "Unable to insert " + values.get(PetEntry.COLUMN_PET_NAME).toString());
         }
         else
         {
-            Log.v("INSERTTING PET INFO", "Success insertting " + values.get(PetEntry.COLUMN_PET_NAME).toString());
+            Log.v("CatalogActivity", "New row ID: " + newRowId);
         }
-
-        // Update the display info
-        displayDatabaseInfo();
     }
 
     @Override
@@ -127,6 +136,9 @@ public class CatalogActivity extends AppCompatActivity {
             case R.id.action_insert_dummy_data:
                 // Insert pet
                 insertPet();
+
+                // Update the display info
+                displayDatabaseInfo();
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
