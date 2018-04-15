@@ -72,6 +72,9 @@ public class EditorActivity extends AppCompatActivity {
         setupSpinner();
     }
 
+    /**
+     * method for inserting the pet into the database
+     */
     private void insertPet()
     {
         // Getting Pet Values
@@ -80,11 +83,7 @@ public class EditorActivity extends AppCompatActivity {
         int weight = Integer.parseInt(mWeightEditText.getText().toString().trim());
 
         // Creating an entry for the database
-        ContentValues values = new ContentValues();
-        values.put(PetEntry.COLUMN_PET_NAME, nameString);
-        values.put(PetEntry.COLUMN_PET_BREED, breedString);
-        values.put(PetEntry.COLUMN_PET_GENDER, mGender);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
+        ContentValues values = createEntry(nameString, breedString, mGender, weight);
 
         // Get the writable database
         PetDbHelper mDbHelper = new PetDbHelper(this);
@@ -94,17 +93,21 @@ public class EditorActivity extends AppCompatActivity {
         // Save row number for entry
         long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
 
-        // Show Toast message
+        // Setting up context for Toast message
         Context context = getApplicationContext();
 
-        // Getting toast message
+        // Setting up toast message text
         CharSequence text;
+
+        // If entry was invalid
         if(newRowId == -1)
         {
+            // Toast should show that it was invalid
             text = "Error saving pet";
         }
-        else
+        else // Entry was good
         {
+            // Show id of the saved pet
             text = "Pet saved with id: " + newRowId;
         }
 
@@ -114,6 +117,26 @@ public class EditorActivity extends AppCompatActivity {
         // Create and show toast message
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
+    }
+
+    /**
+     * Creates entry for the database
+     * @param name - Name of the pet
+     * @param breed - Breed of the pet
+     * @param gender - Gender (0 - Unknown, 1 - Male, 2 - Female)
+     * @param weight - Weight (in kg) of the pet
+     * @return ContentValue for inserting into the database
+     */
+    private ContentValues createEntry(String name, String breed, int gender, int weight)
+    {
+        // Creating pet
+        ContentValues petValues = new ContentValues();
+        petValues.put(PetEntry.COLUMN_PET_NAME, name);
+        petValues.put(PetEntry.COLUMN_PET_BREED, breed);
+        petValues.put(PetEntry.COLUMN_PET_GENDER, gender);
+        petValues.put(PetEntry.COLUMN_PET_WEIGHT, weight);
+
+        return petValues;
     }
 
     /**

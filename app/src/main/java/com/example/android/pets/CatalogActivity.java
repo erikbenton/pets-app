@@ -95,12 +95,8 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void insertPet()
     {
-        // Creating Toto
-        ContentValues values = new ContentValues();
-        values.put(PetEntry.COLUMN_PET_NAME, "Toto");
-        values.put(PetEntry.COLUMN_PET_BREED, "Terrier");
-        values.put(PetEntry.COLUMN_PET_GENDER, PetEntry.GENDER_MALE);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
+        // Creating pet values for inserting
+        ContentValues values = createEntry("Toto", "Terrier", PetEntry.GENDER_MALE, 7);
 
         // Get the writable database
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -116,6 +112,26 @@ public class CatalogActivity extends AppCompatActivity {
         {
             Log.v("CatalogActivity", "New row ID: " + newRowId);
         }
+    }
+
+    /**
+     * Creates entry for the database
+     * @param name - Name of the pet
+     * @param breed - Breed of the pet
+     * @param gender - Gender (0 - Unknown, 1 - Male, 2 - Female)
+     * @param weight - Weight (in kg) of the pet
+     * @return ContentValue for inserting into the database
+     */
+    private ContentValues createEntry(String name, String breed, int gender, int weight)
+    {
+        // Creating pet
+        ContentValues petValues = new ContentValues();
+        petValues.put(PetEntry.COLUMN_PET_NAME, name);
+        petValues.put(PetEntry.COLUMN_PET_BREED, breed);
+        petValues.put(PetEntry.COLUMN_PET_GENDER, gender);
+        petValues.put(PetEntry.COLUMN_PET_WEIGHT, weight);
+
+        return petValues;
     }
 
     @Override
