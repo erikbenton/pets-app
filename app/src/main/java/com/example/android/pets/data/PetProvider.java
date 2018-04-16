@@ -3,6 +3,7 @@ package com.example.android.pets.data;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -108,6 +109,30 @@ public class PetProvider extends ContentProvider
      */
     private Uri insertPet(Uri uri, ContentValues values)
     {
+
+        // Data validation checks
+        String name = values.getAsString(PetEntry.COLUMN_PET_NAME);
+        Integer gender = values.getAsInteger(PetEntry.COLUMN_PET_GENDER);
+        Integer weight  = values.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
+
+        // Check the name
+        if(name == null)
+        {
+            throw new IllegalArgumentException("Pet requires a name");
+        }
+
+        // Check the gender
+        if(gender == null || !PetEntry.isValidGender(gender))
+        {
+            throw new IllegalArgumentException("Pet requires valid gender");
+        }
+
+        // Check the weight
+        if(weight != null && weight < 0)
+        {
+            throw new IllegalArgumentException("Pet requires valid weight");
+        }
+
         // Get the writable database
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
