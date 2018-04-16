@@ -19,6 +19,7 @@ public final class PetContract
         // Complete content uri constant
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS);
 
+        // Constants for the pets table database
         public static final String TABLE_NAME = "pets";
         public static final String _ID = BaseColumns._ID;
         public static final String COLUMN_PET_NAME   = "name";
