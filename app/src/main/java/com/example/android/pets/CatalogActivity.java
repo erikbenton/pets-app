@@ -72,9 +72,6 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void displayDatabaseInfo() {
 
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         // Define projection for database query
         String[] projection = {
                 PetEntry._ID,
@@ -85,9 +82,7 @@ public class CatalogActivity extends AppCompatActivity {
         };
 
         // Perform query to get all the rows from the database for our Cursor
-        Cursor cursor = db.query(PetEntry.TABLE_NAME,
-                                 projection,
-                        null, null, null, null, null);
+        Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, projection, null, null, null);
 
         // Get the TextView for the displayView
         TextView displayView = (TextView) findViewById(R.id.text_view_pet);
