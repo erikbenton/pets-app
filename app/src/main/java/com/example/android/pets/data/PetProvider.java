@@ -111,27 +111,7 @@ public class PetProvider extends ContentProvider
     {
 
         // Data validation checks
-        String name = values.getAsString(PetEntry.COLUMN_PET_NAME);
-        Integer gender = values.getAsInteger(PetEntry.COLUMN_PET_GENDER);
-        Integer weight  = values.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
-
-        // Check the name
-        if(name == null)
-        {
-            throw new IllegalArgumentException("Pet requires a name");
-        }
-
-        // Check the gender
-        if(gender == null || !PetEntry.isValidGender(gender))
-        {
-            throw new IllegalArgumentException("Pet requires valid gender");
-        }
-
-        // Check the weight
-        if(weight != null && weight < 0)
-        {
-            throw new IllegalArgumentException("Pet requires valid weight");
-        }
+        dataValidation(values);
 
         // Get the writable database
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -158,8 +138,72 @@ public class PetProvider extends ContentProvider
      * Updates the data at the given selection and selection arguments, with the new ContentValues.
      */
     @Override
-    public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs)
+    {
+        final int match = sUriMatcher.match(uri);
+
+        switch (match)
+        {
+            case PETS:
+                return updatePet(uri, contentValues, selection, selectionArgs);
+            case PET_ID:
+
+                // Get the selection and selection args from the URI
+                selection = PetEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return updatePet(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update is not supported for " + uri);
+        }
+    }
+
+    /**
+     * Update pets in the database with the given content values. Apply the changes to the rows
+     * specified in the selection and selection arguments (which could be 0 or 1 or more pets).
+     * Return the number of rows that were successfully updated.
+     */
+    private int updatePet(Uri uri, ContentValues values, String selection, String[] selectionArgs)
+    {
+
+        // Check size of values
+        if(values.size() == 0)
+        {
+            return 0;
+        }
+
+        dataValidation(values);
+
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        // Update the selected pets in the pets database table with the given ContentValues
+        int numberOfRows = db.update(PetEntry.TABLE_NAME, values, selection, selectionArgs);
+
+        return numberOfRows;
+    }
+
+    private void dataValidation(ContentValues values)
+    {
+        // Data validation checks
+        String name = values.getAsString(PetEntry.COLUMN_PET_NAME);
+        Integer gender = values.getAsInteger(PetEntry.COLUMN_PET_GENDER);
+        Integer weight  = values.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
+
+        // Check the name
+        if(name == null)
+        {
+            throw new IllegalArgumentException("Pet requires a name");
+        }
+
+        // Check the gender
+        if(gender == null || !PetEntry.isValidGender(gender))
+        {
+            throw new IllegalArgumentException("Pet requires valid gender");
+        }
+
+        // Check the weight
+        if(weight != null && weight < 0)
+        {
+            throw new IllegalArgumentException("Pet requires valid weight");
+        }
     }
 
     /**
