@@ -18,41 +18,37 @@ package com.example.android.pets;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.android.pets.data.PetDbHelper;
 import com.example.android.pets.data.PetContract.PetEntry;
+
 
 /**
  * Displays list of pets that were entered and stored in the app.
  */
-public class CatalogActivity extends AppCompatActivity {
-
-    // Variable for holding database helper
-    private PetDbHelper mDbHelper;
+public class CatalogActivity extends AppCompatActivity
+{
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
 
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        mDbHelper = new PetDbHelper(this);
-
         // Setup FAB to open EditorActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
                 startActivity(intent);
             }
@@ -70,7 +66,8 @@ public class CatalogActivity extends AppCompatActivity {
      * Temporary helper method to display information in the onscreen TextView about the state of
      * the pets database.
      */
-    private void displayDatabaseInfo() {
+    private void displayDatabaseInfo()
+    {
 
         // Define projection for database query
         String[] projection = {
@@ -87,7 +84,8 @@ public class CatalogActivity extends AppCompatActivity {
         // Get the TextView for the displayView
         TextView displayView = (TextView) findViewById(R.id.text_view_pet);
 
-        try {
+        try
+        {
             displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
             displayView.append(PetEntry._ID + " - " +
                                PetEntry.COLUMN_PET_NAME + " - " +
@@ -120,12 +118,15 @@ public class CatalogActivity extends AppCompatActivity {
                                    currentWeight + "\n");
             }
 
-        } finally {
+        } finally
+        {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid.
             cursor.close();
         }
     }
+
+
 
     /**
      * Inserts pet info into the database and updates display info
@@ -135,20 +136,11 @@ public class CatalogActivity extends AppCompatActivity {
         // Creating pet values for inserting
         ContentValues values = createEntry("Toto", "Terrier", PetEntry.GENDER_MALE, 7);
 
-        // Get the writable database
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-
-        // Insert data into table
-        if(newRowId == -1)
-        {
-            Log.v("INSERTING PET INFO", "Unable to insert " + values.get(PetEntry.COLUMN_PET_NAME).toString());
-        }
-        else
-        {
-            Log.v("CatalogActivity", "New row ID: " + newRowId);
-        }
+        // Insert a new row for Toto into the provider using the ContentResolver.
+        // Use the {@link PetEntry#CONTENT_URI} to indicate that we want to insert
+        // into the pets database table.
+        // Receive the new content URI that will allow us to access Toto's data in the future.
+        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
     }
 
     /**
@@ -172,7 +164,8 @@ public class CatalogActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         // Inflate the menu options from the res/menu/menu_catalog.xml file.
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_catalog, menu);
@@ -180,7 +173,8 @@ public class CatalogActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             // Respond to a click on the "Insert dummy data" menu option

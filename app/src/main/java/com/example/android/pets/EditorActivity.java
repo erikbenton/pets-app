@@ -18,6 +18,7 @@ package com.example.android.pets;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -85,38 +86,22 @@ public class EditorActivity extends AppCompatActivity {
         // Creating an entry for the database
         ContentValues values = createEntry(nameString, breedString, mGender, weight);
 
-        // Get the writable database
-        PetDbHelper mDbHelper = new PetDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        // Insert the entry
+        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-        // Insert the values into the database
-        // Save row number for entry
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-
-        // Setting up context for Toast message
-        Context context = getApplicationContext();
-
-        // Setting up toast message text
-        CharSequence text;
-
-        // If entry was invalid
-        if(newRowId == -1)
+        // Show a toast message depending on whether or not the insertion was successful
+        if (newUri == null)
         {
-            // Toast should show that it was invalid
-            text = "Error saving pet";
+            // If the new content URI is null, then there was an error with insertion.
+            Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
+                    Toast.LENGTH_SHORT).show();
         }
-        else // Entry was good
+        else
         {
-            // Show id of the saved pet
-            text = "Pet saved with id: " + newRowId;
+            // Otherwise, the insertion was successful and we can display a toast.
+            Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+                    Toast.LENGTH_SHORT).show();
         }
-
-        // Set length of toast message
-        int duration = Toast.LENGTH_SHORT;
-
-        // Create and show toast message
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
     }
 
     /**
