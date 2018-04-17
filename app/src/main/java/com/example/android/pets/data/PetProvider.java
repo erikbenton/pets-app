@@ -217,15 +217,36 @@ public class PetProvider extends ContentProvider
      * Delete the data at the given selection and selection arguments.
      */
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+    public int delete(Uri uri, String selection, String[] selectionArgs)
+    {
+
+        // Get the writable database
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // Get the match for the URI
+        final int match = sUriMatcher.match(uri);
+
+        switch (match)
+        {
+            case PETS:
+                return db.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+            case PET_ID:
+
+                // Get the selection and selection args from the URI
+                selection = PetEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return db.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Delete is not supported for " + uri);
+        }
     }
 
     /**
      * Returns the MIME type of data for the content URI.
      */
     @Override
-    public String getType(Uri uri) {
+    public String getType(Uri uri)
+    {
         return null;
     }
 }
