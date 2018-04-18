@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.android.pets.data.PetContract.PetEntry;
@@ -85,6 +86,11 @@ public class CatalogActivity extends AppCompatActivity
 
         // Find ListView to populate
         ListView petListView = (ListView) findViewById(R.id.list);
+
+        // Find and set EmptyView
+        View emptyView = (RelativeLayout) findViewById(R.id.empty_view);
+        petListView.setEmptyView(emptyView);
+
 
         // Setup the cursor adapter
         PetCursorAdapter petCursorAdapter = new PetCursorAdapter(this, cursor);
