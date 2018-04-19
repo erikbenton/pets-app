@@ -17,6 +17,7 @@ package com.example.android.pets;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -63,6 +64,28 @@ public class EditorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        // Use getIntent() and getData() to get the associated URI
+        Intent sentIntent = getIntent();
+
+        Uri contentPetUri = sentIntent.getData();
+
+
+        // Set the title of the EditorActivity on which situation we have
+        // If the EditorActivity was opened using the ListView item, then we will
+        // have URI of pet to change app bar to say "Edit Pet"
+        // Otherwise if this is a new pet, URI is null so change app to say "Add Pet"
+        if(contentPetUri == null)
+        {
+            // Clicking on the FAB for adding a pet
+            setTitle(R.string.editor_activity_title_new_pet);
+        }
+        else
+        {
+            // Clicking on a specific pet
+            setTitle(R.string.editor_activity_title_edit_pet);
+        }
+
 
         // Find all relevant views that we will need to read user input from
         mNameEditText = (EditText) findViewById(R.id.edit_pet_name);

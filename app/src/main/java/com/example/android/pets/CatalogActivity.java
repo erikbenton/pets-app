@@ -16,6 +16,7 @@
 package com.example.android.pets;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -25,9 +26,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -71,6 +74,27 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 startActivity(intent);
             }
         });
+
+        // Set on item click listener to listed pets
+        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id)
+            {
+                // Create URI for clicked on Pet
+                Uri uri = ContentUris.withAppendedId(PetEntry.CONTENT_URI, id);
+
+                // Create Intent for opening the Editor Activity
+                Intent openEditPet = new Intent(CatalogActivity.this, EditorActivity.class);
+
+                // Add the uri data to the Intent
+                openEditPet.setData(uri);
+
+                // Start the EditorActivity with the Intent
+                startActivity(openEditPet);
+            }
+        });
+            // Have it send intent with that pet's URI
 
         // Init the loader
         getLoaderManager().initLoader(PET_LOADER, null, this);
@@ -134,9 +158,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             case R.id.action_insert_dummy_data:
                 // Insert pet
                 insertPet();
-
-                // Update the display info
-                //displayDatabaseInfo();
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
