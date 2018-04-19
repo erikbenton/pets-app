@@ -84,6 +84,11 @@ public class PetProvider extends ContentProvider
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
 
+        // Set notification URI on the Cursor
+        // so that we know what Content URI the Cursor was created for.
+        // If the data at this URI changes, then we know we need to update the Cursor
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         return cursor;
     }
 
@@ -129,6 +134,11 @@ public class PetProvider extends ContentProvider
         {
             Log.v("CatalogActivity", "New row ID: " + id);
         }
+
+        // Notify all Listeners that the data has changed for the pet content URI
+        // uri: content://com.example.android.pets/pets
+        getContext().getContentResolver().notifyChange(uri, null);
+
         // Once we know the ID of the new row in the table,
         // return the new URI with the ID appended to the end of it
         return ContentUris.withAppendedId(uri, id);
@@ -172,6 +182,10 @@ public class PetProvider extends ContentProvider
         }
 
         dataValidation(values);
+
+        // Notify all Listeners that the data has changed for the pet content URI
+        // uri: content://com.example.android.pets/pets
+        getContext().getContentResolver().notifyChange(uri, null);
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         // Update the selected pets in the pets database table with the given ContentValues
@@ -222,6 +236,10 @@ public class PetProvider extends ContentProvider
 
         // Get the writable database
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // Notify all Listeners that the data has changed for the pet content URI
+        // uri: content://com.example.android.pets/pets
+        getContext().getContentResolver().notifyChange(uri, null);
 
         // Get the match for the URI
         final int match = sUriMatcher.match(uri);
