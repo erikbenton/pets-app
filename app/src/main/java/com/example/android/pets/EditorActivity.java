@@ -15,6 +15,7 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -43,6 +44,7 @@ import android.widget.Toast;
 import com.example.android.pets.data.PetContract;
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetDbHelper;
+import com.example.android.pets.data.PetProvider;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -115,9 +117,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     /**
-     * method for inserting the pet into the database
+     * method for saving a pet in the database
      */
-    private void insertPet()
+    private void savePet()
     {
         // Getting Pet Values
         String nameString = mNameEditText.getText().toString().trim();
@@ -127,11 +129,20 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Creating an entry for the database
         ContentValues values = createEntry(nameString, breedString, mGender, weight);
 
-        // Insert the entry
-        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+        int rowsAffected = 0;
+
+        if(mContentPetUri == null)
+        {
+            // Insert the entry
+            Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+        }
+        else
+        {
+            rowsAffected = getContentResolver().update(mContentPetUri, values, null, null);
+        }
 
         // Show a toast message depending on whether or not the insertion was successful
-        if (newUri == null)
+        if (rowsAffected == 0)
         {
             // If the new content URI is null, then there was an error with insertion.
             Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
@@ -219,7 +230,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Insert the pet into the database
-                insertPet();
+                savePet();
 
                 // Go back to Catalog
                 finish();
@@ -241,7 +252,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public android.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle)
     {
-        return new CursorLoader(this, mContentPetUri, null, null, null, null);
+        // Since the editor shows all pet attributes, define a projection that contains
+        // all columns from the pet table
+        String[] projection = {
+                PetEntry._ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED,
+                PetEntry.COLUMN_PET_GENDER,
+                PetEntry.COLUMN_PET_WEIGHT };
+
+        return new CursorLoader(this, mContentPetUri, projection, null, null, null);
     }
 
     @Override
