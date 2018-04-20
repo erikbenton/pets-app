@@ -17,20 +17,27 @@ package com.example.android.pets;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.app.LoaderManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract;
@@ -40,7 +47,15 @@ import com.example.android.pets.data.PetDbHelper;
 /**
  * Allows user to create a new pet or edit an existing one.
  */
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
+{
+    // ID for the loader
+    private static final int PET_EDIT_LOADER = 1;
+
+    /** Pet Cursor Adapter */
+    private CursorAdapter mPetCursorAdapter;
+
+    private Uri mContentPetUri;
 
     /** EditText field to enter the pet's name */
     private EditText mNameEditText;
@@ -68,14 +83,14 @@ public class EditorActivity extends AppCompatActivity {
         // Use getIntent() and getData() to get the associated URI
         Intent sentIntent = getIntent();
 
-        Uri contentPetUri = sentIntent.getData();
+        mContentPetUri = sentIntent.getData();
 
 
         // Set the title of the EditorActivity on which situation we have
         // If the EditorActivity was opened using the ListView item, then we will
         // have URI of pet to change app bar to say "Edit Pet"
         // Otherwise if this is a new pet, URI is null so change app to say "Add Pet"
-        if(contentPetUri == null)
+        if(mContentPetUri == null)
         {
             // Clicking on the FAB for adding a pet
             setTitle(R.string.editor_activity_title_new_pet);
@@ -84,6 +99,8 @@ public class EditorActivity extends AppCompatActivity {
         {
             // Clicking on a specific pet
             setTitle(R.string.editor_activity_title_edit_pet);
+            // Init the loader
+            getLoaderManager().initLoader(PET_EDIT_LOADER, null, this);
         }
 
 
@@ -94,6 +111,7 @@ public class EditorActivity extends AppCompatActivity {
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
         setupSpinner();
+
     }
 
     /**
@@ -217,5 +235,40 @@ public class EditorActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public android.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle)
+    {
+        return new CursorLoader(this, mContentPetUri, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursor)
+    {
+        // Move to first position in cursor
+        cursor.moveToFirst();
+
+        // Get the attributes of the pet to fill View with
+        String petName = cursor.getString((cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME)));
+        String petBreed = cursor.getString((cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED)));
+        String petWeight = cursor.getString((cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT)));
+        int petGender = cursor.getInt((cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER)));
+
+        // Give the views the appropriate values
+        mNameEditText.setText(petName, TextView.BufferType.EDITABLE);
+        mBreedEditText.setText(petBreed, TextView.BufferType.EDITABLE);
+        mWeightEditText.setText(petWeight, TextView.BufferType.EDITABLE);
+        mGenderSpinner.setSelection(petGender);
+    }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<Cursor> loader)
+    {
+        mNameEditText.setText("");
+        mBreedEditText.setText("");
+        mWeightEditText.setText("");
+        mGenderSpinner.setSelection(0);
     }
 }
