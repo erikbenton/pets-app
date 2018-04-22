@@ -56,13 +56,13 @@
     <!-- Dialog message to ask the user to confirm deleting the current pet [CHAR LIMIT=NONE] -->
     <string name="delete_dialog_msg">Delete this pet?</string>
 
-    <!-- Dialog message to ask the user to confirm deleting the current pet [CHAR LIMIT=NONE] -->
+    <!-- Dialog message to ask the user to confirm deleting all the pets [CHAR LIMIT=NONE] -->
     <string name="delete_all_entries_dialog_msg">Delete all pets?</string>
 
-    <!-- Dialog button text for the option to confirm deleting the current pet [CHAR LIMIT=20] -->
+    <!-- Dialog button text for the option to confirm deleting a pet [CHAR LIMIT=20] -->
     <string name="delete">Delete</string>
 
-    <!-- Dialog button text for the option to cancel deletion of the current pet [CHAR LIMIT=20] -->
+    <!-- Dialog button text for the option to cancel deletion a pet [CHAR LIMIT=20] -->
     <string name="cancel">Cancel</string>
 
     <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
@@ -82,6 +82,9 @@
 
     <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
     <string name="hint_pet_weight">Weight</string>
+
+    <!-- Breed entry when breed is unknown -->
+    <string name="unknown_pet_breed">Unknown breed</string>
 
     <!-- Units for weight of the pet (kilograms) [CHAR LIMIT=5] -->
     <string name="unit_pet_weight">kg</string>

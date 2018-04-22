@@ -248,7 +248,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         int rowsAffected = 0;
 
-        if(!TextUtils.isEmpty(nameString) || !TextUtils.isEmpty(breedString) || !TextUtils.isEmpty(weightString))
+        if(!TextUtils.isEmpty(nameString) && !TextUtils.isEmpty(weightString))
         {
             if (mContentPetUri == null)
             {
