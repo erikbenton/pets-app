@@ -15,10 +15,12 @@
  */
 package com.example.android.pets;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -35,6 +37,7 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetProvider;
@@ -140,6 +143,57 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         return petValues;
     }
 
+    private void showDeleteAllConfirmationDialog()
+    {
+        // Create and AlertDialog.Builder and set the message and click listener
+        // for the positive and negative buttons on the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_all_entries_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                // User clicked the delete button
+                deleteAllPets();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int id)
+            {
+                if(dialog != null)
+                {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the Alert Dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void deleteAllPets()
+    {
+
+        int numberOfPetsDeleted = getContentResolver().delete(PetEntry.CONTENT_URI, null, null);
+
+        if(numberOfPetsDeleted == 0)
+        {
+            // Unable to delete pets
+            Toast.makeText(this, getString(R.string.catalog_delete_pets_failed),
+                    Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            // Pets were deleted
+            Toast.makeText(this, getString(R.string.catalog_delete_pets_successful),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -161,7 +215,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                // Do nothing for now
+                // Delete all the pets from the database
+                showDeleteAllConfirmationDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
