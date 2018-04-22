@@ -148,8 +148,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private void showUnsavedChangesDialog(DialogInterface.OnClickListener discardButtonClickListener)
     {
-        // Create an alert dialog builder and set the messsage and click listeners for the
-        //  positive and negative buttons on the dialog
+        // Create an alert dialog builder and set the message and click listeners for the
+        // positive and negative buttons on the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.unsaved_changes_dialog_msg);
         builder.setPositiveButton(R.string.discard, discardButtonClickListener);
@@ -167,6 +167,38 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         });
 
         // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void showDeleteConfirmationDialog()
+    {
+        // Create and AlertDialog.Builder and set the message and click listener
+        // for the positive and negative buttons on the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                // User clicked the delete button
+                deletePet();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int id)
+            {
+                if(dialog != null)
+                {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the Alert Dialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -264,6 +296,35 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     /**
+     * Delete the pet from the database
+     */
+    private void deletePet()
+    {
+        if(mContentPetUri == null)
+        {
+            return;
+        }
+        else
+        {
+            int numberOfPetsDeleted = getContentResolver().delete(mContentPetUri, null, null);
+
+            if(numberOfPetsDeleted == 0)
+            {
+                // Unable to delete pet
+                Toast.makeText(this, getString(R.string.editor_delete_pet_failed),
+                        Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                // Pet was deleted
+                Toast.makeText(this, getString(R.string.editor_delete_pet_successful),
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
+
+    /**
      * Setup the dropdown spinner that allows the user to select the gender of the pet.
      */
     private void setupSpinner() {
@@ -338,7 +399,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
-                // Do nothing for now
+
+                // Show Dialog Interface for displaying confirmation of pet deletion
+                showDeleteConfirmationDialog();
                 return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
@@ -389,6 +452,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursor)
     {
+        // Cursor check
+        if(cursor == null || (cursor != null && cursor.getCount() == 0))
+        {
+            return;
+        }
+
         // Move to first position in cursor
         cursor.moveToFirst();
 
