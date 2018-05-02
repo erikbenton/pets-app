@@ -139,10 +139,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private View.OnTouchListener mTouchListener = new View.OnTouchListener()
     {
         @Override
-        public boolean onTouch(View view, MotionEvent motionEvent)
+        public boolean onTouch(View view, MotionEvent event)
         {
-            mPetHasChanged = true;
-            return true;
+            if(event.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                mPetHasChanged = true;
+                view.requestFocus();
+                return true;
+            }
+            return false;
         }
     };
 
@@ -254,6 +259,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             {
                 // Insert the entry
                 Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+                rowsAffected++;
             }
             else
             {
